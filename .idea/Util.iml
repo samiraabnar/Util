@@ -4,5 +4,8 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="jdk" jdkName="Python 3.5.0 (/Library/Frameworks/Python.framework/Versions/3.5/bin/python3.5)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="GRU" />
+    <orderEntry type="module" module-name="SimpleNeuralNetwork" />
+    <orderEntry type="module" module-name="RecurrentNeuralNetwork" />
   </component>
 </module>
