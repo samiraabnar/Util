@@ -1,3 +1,5 @@
+import re
+
 class FileUtil(object):
 
     def read_glove_vec(filename):
@@ -95,6 +97,24 @@ class FileUtil(object):
                 str = re.sub(r"\s*(\(\d+)", "", str)
                 str = re.sub(r"\)", "", str)
                 filedata.write('%s\n' % (str.strip()))
+
+
+    def get_sentence_and_label_from_tree_annotation(filename,samefile=False):
+        with open(filename,'r') as filedata:
+            data = filedata.readlines()
+        outputfilename = filename
+        if samefile == False:
+            outputfilename = filename.replace(".txt","sentence_and_label.txt")
+
+        with open(outputfilename, 'w') as filedata:
+            for(number, annotatedSent) in enumerate(data):
+                label_match = re.search(r"\((\d+)\s*\(",annotatedSent)
+                label = label_match.group(1)
+
+                annotatedSent = re.sub(r"\s*(\(\d+)", "", annotatedSent)
+                annotatedSent = re.sub(r"\)", "", annotatedSent)
+                filedata.write('%s %s\n' % (label.strip(),annotatedSent.strip()))
+
 
     def file_2_vec(filename,start,end):
         with open(filename,'r') as filedata:
