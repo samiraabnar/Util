@@ -151,5 +151,34 @@ class DataPrep(object):
 
 
 
+    def load_one_hot_sentiment_data_traind_vocabulary(filename,word_to_index,index_to_word,labelsCount,vocabulary_count=0, start=0, end=-1):
+
+        with open(filename,'r') as filedata:
+            data = filedata.readlines()[start:end]
+
+        tokenized_sentences_with_labels = []
+        for sent in data:
+            tokenized = nltk.word_tokenize(sent.lower())
+            tokenized_sentences_with_labels.append((int(tokenized[0]),tokenized[1:]))
+
+
+
+        one_hot_sentences = []
+        one_hot_sentiments = []
+        one_hot_labels = np.eye(labelsCount,dtype=np.float32 )
+        one_hot_vocab = np.eye(len(word_to_index),dtype=np.float32)
+        for sent in tokenized_sentences_with_labels:
+            label = one_hot_labels[sent[0]]
+            sentence = [one_hot_vocab[word_to_index[term] if term in index_to_word else word_to_index[UNKNOWN_TOKEN]] for term in sent[1]]
+            one_hot_sentences.append(sentence)
+            one_hot_sentiments.append(label)
+
+
+
+
+        return one_hot_sentences, one_hot_sentiments
+
+
+
 
 

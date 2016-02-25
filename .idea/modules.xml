@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$APPLICATION_HOME_DIR$/bin/~/Codes/CNN/.idea/CNN.iml" filepath="$APPLICATION_HOME_DIR$/bin/~/Codes/CNN/.idea/CNN.iml" />
       <module fileurl="file://$PROJECT_DIR$/../GRU/.idea/GRU.iml" filepath="$PROJECT_DIR$/../GRU/.idea/GRU.iml" />
+      <module fileurl="file://$APPLICATION_HOME_DIR$/bin/~/Codes/QLearner/.idea/QLearner.iml" filepath="$APPLICATION_HOME_DIR$/bin/~/Codes/QLearner/.idea/QLearner.iml" />
       <module fileurl="file://$PROJECT_DIR$/../RecurrentNeuralNetwork/.idea/RecurrentNeuralNetwork.iml" filepath="$PROJECT_DIR$/../RecurrentNeuralNetwork/.idea/RecurrentNeuralNetwork.iml" />
       <module fileurl="file://$PROJECT_DIR$/../SimpleNeuralNetwork/.idea/SimpleNeuralNetwork.iml" filepath="$PROJECT_DIR$/../SimpleNeuralNetwork/.idea/SimpleNeuralNetwork.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Util.iml" filepath="$PROJECT_DIR$/.idea/Util.iml" />

@@ -8,5 +8,6 @@
     <orderEntry type="module" module-name="SimpleNeuralNetwork" />
     <orderEntry type="module" module-name="RecurrentNeuralNetwork" />
     <orderEntry type="module" module-name="CNN" />
+    <orderEntry type="module" module-name="QLearner" />
   </component>
 </module>
