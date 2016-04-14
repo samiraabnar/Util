@@ -154,6 +154,36 @@ class DataPrep(object):
 
 
 
+    def get_dic_from_sentiment_data(self, filenames):
+        data = []
+        for filename in filenames:
+            with open(filename,'r') as filedata:
+                data.extend(filedata.readlines())
+
+        labelSet = set()
+        tokenized_sentences_with_labels = []
+        tokenized_sentences = []
+        for sent in data:
+            tokenized = nltk.word_tokenize(sent.lower())
+            tokenized_sentences_with_labels.append((int(tokenized[0]),tokenized[1:]))
+            tokenized_sentences.append(tokenized[1:])
+            labelSet.add(int(tokenized[0]))
+
+        word_freq = nltk.FreqDist(itertools.chain(*tokenized_sentences))
+        print("Found %d unique words tokens." % len(word_freq.items()))
+
+        vocabulary_count = len(word_freq.items())
+
+        vocab = sorted(word_freq.items(), key=lambda x: (x[1], x[0]), reverse=True)[:vocabulary_count]
+        print("Using vocabulary size %d." % vocabulary_count)
+        print("The least frequent word in our vocabulary is '%s' and appeared %d times." % (vocab[-1][0], vocab[-1][1]))
+
+        sorted_vocab = sorted(vocab, key=operator.itemgetter(1))
+        index_to_word = [UNKNOWN_TOKEN] + [x[0] for x in sorted_vocab]
+        word_to_index = dict([(w, i) for i, w in enumerate(index_to_word)])
+
+        return word_to_index,index_to_word
+
     def load_one_hot_sentiment_data_traind_vocabulary(filename,word_to_index,index_to_word,labelsCount,vocabulary_count=0, start=0, end=-1):
 
         with open(filename,'r') as filedata:
