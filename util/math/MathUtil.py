@@ -10,10 +10,19 @@ class MathUtil(object):
     def sigmoid(x):
         return 1.0 / (1 + np.exp(-x))
 
+    def is_float(str):
+        try:
+            float(str)
+            return True
+        except ValueError:
+            return False
+
 
 if __name__ == '__main__':
     a = np.array([1,2,3])
     b = MathUtil.sigmoid(a)
     print(b)
+
+
 
 
