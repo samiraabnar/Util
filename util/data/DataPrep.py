@@ -135,7 +135,7 @@ class DataPrep(object):
         sorted_vocab = sorted(vocab, key=operator.itemgetter(1))
         for x in sorted_vocab:
             if x[0] not in index_to_word:
-                index_to_word += x[0]
+                index_to_word.append(x[0])
 
         word_to_index = dict([(w, i) for i, w in enumerate(index_to_word)])
 
@@ -215,7 +215,7 @@ class DataPrep(object):
         return one_hot_sentences, one_hot_sentiments
 
 
-    def load_sentiment_data(filename,index_to_word=[UNKNOWN_TOKEN],vocabulary_count=0, start=0, end=-1):
+    def load_sentiment_data(filename,index_to_word=[UNKNOWN_TOKEN],label_count=0, vocabulary_count=0, start=0, end=-1):
 
         with open(filename,'r') as filedata:
             data = filedata.readlines()[start:end]
@@ -242,13 +242,14 @@ class DataPrep(object):
         sorted_vocab = sorted(vocab, key=operator.itemgetter(1))
         for x in sorted_vocab:
             if x[0] not in index_to_word:
-                index_to_word += x[0]
+                index_to_word.append(x[0])
 
         word_to_index = dict([(w, i) for i, w in enumerate(index_to_word)])
 
         sentences = []
         one_hot_sentiments = []
-        label_count = max(labelSet)+1
+        if label_count == 0:
+            label_count = max(labelSet)+1
         one_hot_labels = np.eye(label_count,dtype=np.float32 )
         one_hot_vocab = np.eye(vocabulary_count+1,dtype=np.float32)
         for sent in tokenized_sentences_with_labels:
