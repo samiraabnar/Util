@@ -1,13 +1,16 @@
 import theano
 import theano.tensor as T
 import numpy as np
+from Util.util.nnet.theanocore import *
+from collections import OrderedDict
+
+
 
 class LearningAlgorithms(object):
 
 
     @staticmethod
-    def adam(loss, all_params, learning_rate=0.0001, beta1=0.9, beta2=0.999, epsilon=1e-8,
-         gamma=1-1e-8):
+    def adam(loss, params, lr=0.001, b1=0.9, b2=0.999, eps=1e-8):
         """
         ADAM update rules
         Default values are taken from [Kingma2014]
@@ -32,30 +35,34 @@ class LearningAlgorithms(object):
             - Returns: list of update rules
         """
 
-        updates = []
-        all_grads = theano.grad(loss, all_params)
+        beta1 = variable(value=b1,name="beta1")
+        beta2 = variable(value=b2,name="beta2")
+        learning_rate = variable(value=lr,name="learning_rate")
+        epsilon = variable(value=eps,name="epsilon")
 
-        i = theano.shared(np.float32(1))  # HOW to init scalar shared?
-        i_t = i + 1.
-        fix1 = 1. - (1. - beta1)**i_t
-        fix2 = 1. - (1. - beta2)**i_t
-        beta1_t = 1-(1-beta1)*gamma**(i_t-1)   # ADDED
-        learning_rate_t = learning_rate * (T.sqrt(fix2) / fix1)
+        all_grads = theano.grad(loss, params)
 
-        for param_i, g in zip(all_params, all_grads):
-            m = theano.shared(
-                np.zeros(param_i.get_value().shape, dtype=theano.config.floatX))
-            v = theano.shared(
-                np.zeros(param_i.get_value().shape, dtype=theano.config.floatX))
+        t_prev = theano.shared(np.float32(0))
+        updates = OrderedDict()
 
-            m_t = (beta1_t * g) + ((1. - beta1_t) * m) # CHANGED from b_t TO use beta1_t
-            v_t = (beta2 * g**2) + ((1. - beta2) * v)
-            g_t = m_t / (T.sqrt(v_t) + epsilon)
-            param_i_t = param_i - (learning_rate_t * g_t)
+        t = t_prev + 1
+        a_t = learning_rate/(1-beta1**t)
 
-            updates.append((m, m_t))
-            updates.append((v, v_t))
-            updates.append((param_i, param_i_t) )
-        updates.append((i, i_t))
+        for param, g_t in zip(params, all_grads):
+            value = param.get_value(borrow=True)
+            m_prev = theano.shared(np.zeros(value.shape, dtype=value.dtype),
+                                   broadcastable=param.broadcastable)
+            u_prev = theano.shared(np.zeros(value.shape, dtype=value.dtype),
+                                   broadcastable=param.broadcastable)
 
+            m_t = beta1*m_prev + (1-beta1)*g_t
+            u_t = T.maximum(beta2*u_prev, abs(g_t))
+            step = a_t*m_t/(u_t + epsilon)
+
+            updates[m_prev] = m_t
+            updates[u_prev] = u_t
+            updates[param] = param - step
+
+        updates[t_prev] = t
         return updates
+
