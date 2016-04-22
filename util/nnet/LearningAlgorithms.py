@@ -40,13 +40,13 @@ class LearningAlgorithms(object):
         learning_rate = variable(value=lr,name="learning_rate")
         epsilon = variable(value=eps,name="epsilon")
 
-        all_grads = theano.grad(loss, params)
+        all_grads = theano.grad(theano.gradient.grad_clip(loss,-1,1), params)
 
-        t_prev = theano.shared(np.float32(0))
+        t_prev = theano.shared(np.float32(0.))
         updates = OrderedDict()
 
-        t = t_prev + 1
-        a_t = learning_rate/(1-beta1**t)
+        t = t_prev + 1.0
+        a_t = learning_rate/(1.0-beta1**t)
 
         for param, g_t in zip(params, all_grads):
             value = param.get_value(borrow=True)
@@ -55,7 +55,7 @@ class LearningAlgorithms(object):
             u_prev = theano.shared(np.zeros(value.shape, dtype=value.dtype),
                                    broadcastable=param.broadcastable)
 
-            m_t = beta1*m_prev + (1-beta1)*g_t
+            m_t = beta1*m_prev + (1.0-beta1)*g_t
             u_t = T.maximum(beta2*u_prev, abs(g_t))
             step = a_t*m_t/(u_t + epsilon)
 
