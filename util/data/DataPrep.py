@@ -6,7 +6,7 @@ import numpy as np
 import operator
 import gzip
 import pickle
-
+import os
 import theano
 
 SENTENCE_START_TOKEN = "SENTENCE_START"
@@ -265,6 +265,31 @@ class DataPrep(object):
 
 
     def load_mnist_data(filename):
+
+
+        # Download the MNIST dataset if it is not present
+        data_dir, data_file = os.path.split(filename)
+        if data_dir == "" and not os.path.isfile(filename):
+            # Check if dataset is in the data directory.
+            new_path = os.path.join(
+                os.path.split(__file__)[0],
+                "..",
+                "data",
+                filename
+            )
+            if os.path.isfile(new_path) or data_file == 'mnist.pkl.gz':
+                dataset = new_path
+
+        if (not os.path.isfile(filename)) and data_file == 'mnist.pkl.gz':
+            from six.moves import urllib
+            origin = (
+                'http://www.iro.umontreal.ca/~lisa/deep/data/mnist/mnist.pkl.gz'
+            )
+            print('Downloading data from %s' % origin)
+            urllib.request.urlretrieve(origin, filename)
+
+        print('... loading data')
+
         with gzip.open(filename, 'rb') as f:
             train_data, dev_data, test_data = pickle.load(f,encoding='latin1')
 
