@@ -4,6 +4,11 @@ import numpy as np
 from Util.util.nnet.theanocore import *
 from collections import OrderedDict
 
+import sys
+sys.path.append('../../')
+
+from Util.util.nnet.theanocore import *
+
 
 
 class LearningAlgorithms(object):
@@ -41,6 +46,7 @@ class LearningAlgorithms(object):
         epsilon = variable(value=eps,name="epsilon")
 
         all_grads = theano.grad(theano.gradient.grad_clip(loss,-1,1), params)
+        all_grads = clip_norms(all_grads,0.5)
 
         t_prev = theano.shared(np.float32(0.))
         updates = OrderedDict()
