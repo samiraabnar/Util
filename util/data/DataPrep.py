@@ -328,6 +328,69 @@ class DataPrep(object):
         return rval
 
 
+    def load_not_one_hot_sentiment_data_traind_vocabulary(filename, word_to_index, index_to_word, labelsCount,
+                                                      vocabulary_count=0, start=0, end=-1):
 
+        with open(filename, 'r') as filedata:
+            data = filedata.readlines()[start:end]
 
+        tokenized_sentences_with_labels = []
+        for sent in data:
+            tokenized = nltk.word_tokenize(sent.lower())
+            tokenized_sentences_with_labels.append((int(tokenized[0]), tokenized[1:]))
+
+        one_hot_sentences = []
+        one_hot_sentiments = []
+        one_hot_labels = np.eye(labelsCount, dtype=np.float32)
+        for sent in tokenized_sentences_with_labels:
+            label = one_hot_labels[sent[0]]
+            sentence = [word_to_index[term] if term in index_to_word else word_to_index[UNKNOWN_TOKEN]
+                        for term in sent[1]]
+            one_hot_sentences.append(sentence)
+            one_hot_sentiments.append(label)
+
+        return one_hot_sentences, one_hot_sentiments
+
+    def load_not_one_hot_sentiment_data(filename, index_to_word=[UNKNOWN_TOKEN], vocabulary_count=0, start=0, end=-1):
+
+        with open(filename, 'r') as filedata:
+            data = filedata.readlines()[start:end]
+
+        labelSet = set()
+        tokenized_sentences_with_labels = []
+        tokenized_sentences = []
+        for sent in data:
+            tokenized = nltk.word_tokenize(sent.lower())
+            tokenized_sentences_with_labels.append((int(tokenized[0]), tokenized[1:]))
+            tokenized_sentences.append(tokenized[1:])
+            labelSet.add(int(tokenized[0]))
+
+        word_freq = nltk.FreqDist(itertools.chain(*tokenized_sentences))
+        print("Found %d unique words tokens." % len(word_freq.items()))
+
+        if vocabulary_count == 0:
+            vocabulary_count = len(word_freq.items())
+
+        vocab = sorted(word_freq.items(), key=lambda x: (x[1], x[0]), reverse=True)[:vocabulary_count]
+        print("Using vocabulary size %d." % vocabulary_count)
+        print("The least frequent word in our vocabulary is '%s' and appeared %d times." % (vocab[-1][0], vocab[-1][1]))
+
+        sorted_vocab = sorted(vocab, key=operator.itemgetter(1))
+        for x in sorted_vocab:
+            if x[0] not in index_to_word:
+                index_to_word.append(x[0])
+
+        word_to_index = dict([(w, i) for i, w in enumerate(index_to_word)])
+
+        one_hot_sentences = []
+        one_hot_sentiments = []
+        label_count = max(labelSet) + 1
+        one_hot_labels = np.eye(label_count, dtype=np.float32)
+        for sent in tokenized_sentences_with_labels:
+            label = one_hot_labels[sent[0]]
+            sentence = [word_to_index[term] for term in sent[1]]
+            one_hot_sentences.append(sentence)
+            one_hot_sentiments.append(label)
+
+        return one_hot_sentences, one_hot_sentiments, word_to_index, index_to_word, label_count
 
